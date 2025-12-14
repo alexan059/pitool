@@ -1,8 +1,8 @@
 # pitool
 
-Automated Raspberry Pi SD card provisioning with cloud-init.
+Automated Raspberry Pi boot drive provisioning with cloud-init.
 
-> **Platform Support:** Currently macOS only. Uses `diskutil` and `dd` for direct SD card flashing. Linux and Windows support planned.
+> **Platform Support:** Currently macOS only. Uses `diskutil` and `dd` for direct drive flashing. Linux and Windows support planned.
 >
 > **Why not rpi-imager?** Raspberry Pi Imager 2.0+ removed CLI support (`--cli` flag), so we use direct `dd` flashing with platform abstractions for future cross-platform compatibility.
 
@@ -29,7 +29,7 @@ Automated Raspberry Pi SD card provisioning with cloud-init.
 **Architecture:**
 - Cloud-init based provisioning (Raspberry Pi OS Trixie+)
 - Platform abstraction for future Linux/Windows support
-- Direct SD card flashing via `dd`
+- Direct drive flashing via `dd`
 - Smart caching with hash verification
 
 ## Usage
@@ -39,7 +39,7 @@ Automated Raspberry Pi SD card provisioning with cloud-init.
 ```bash
 git clone <repository-url>
 cd pitool
-uv sync
+uv sync --dev
 ```
 
 ### Configuration
@@ -76,7 +76,7 @@ See `pitool.example.yml` for reference.
 uv run pitool passwd
 ```
 
-**Flash SD card:**
+**Flash boot drive:**
 ```bash
 uv run pitool flash
 
@@ -93,7 +93,11 @@ Waits for Pi to come online, removes old SSH host key, and connects via SSH.
 
 ## Development
 
-This project uses [Task](https://taskfile.dev) for development workflows.
+**Tooling:**
+
+- [uv](https://github.com/astral-sh/uv) (package manager)
+- [hatchling](https://hatch.pypa.io/) (build backend)
+- [Task](https://taskfile.dev) (task runner)
 
 **Install Task:**
 ```bash
@@ -105,6 +109,8 @@ brew install go-task
 ```bash
 # Install dependencies
 task sync
+# or
+uv sync --dev
 
 # Run CLI directly
 task run -- flash

@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "pitool"
-version = "2.0.0"
-description = "Pitool let's you provision your Raspberry Pi's with the command line"
+version = "2.0.1"
+description = "Pitool lets you provision your Raspberry Pis from the command line"
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -20,6 +24,13 @@ dependencies = [
 
 [project.scripts]
 pitool = "main:main"
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+include = ["main.py"]
 
 [tool.ruff]
 line-length = 88
