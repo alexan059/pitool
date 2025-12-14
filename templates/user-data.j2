@@ -1,0 +1,61 @@
+#cloud-config
+#
+# Source: https://www.raspberrypi.com/news/cloud-init-on-raspberry-pi-os/
+
+# Set the hostname for this device. This will also update /etc/hosts if manage_etc_hosts is enabled.
+hostname: {{ hostname }}
+manage_etc_hosts: true
+
+# Set the system timezone and locale
+timezone: {{ timezone }}
+locale: {{ locale }}
+
+# Create a default user account and apply permissions
+users:
+  - name: {{ user.name }}
+    passwd: {{ user.password }}
+    lock_passwd: false  # Set to true to disable password login entirely
+    ssh_authorized_keys:
+        - "{{ user.ssh_public_key }}"
+    sudo: ALL=(ALL) NOPASSWD:ALL  # Allow passwordless sudo for this user
+    groups: users,adm,dialout,audio,netdev,video,plugdev,cdrom,games,input,gpio,spi,i2c,render,sudo
+    shell: /bin/bash
+
+{%- if packages or update or upgrade %}
+
+package_update: true
+{%- if upgrade %}
+package_upgrade: true
+{%- endif %}
+{%- if packages %}
+packages:
+{%- for package in packages %}
+  - {{ package }}
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+
+# Raspberry Pi–specific options (provided by the cc_raspberry_pi module)
+#rpi:
+#    spi: true               # Enable SPI interface
+#    i2c: true               # Enable I2C interface
+#    serial: true            # Enable serial console and UART interface
+#    onewire: true           # Enable 1-Wire interface
+#    enable_usb_gadget: true # Enable USB gadget mode
+
+# Additional Raspberry Pi OS option (not available on generic cloud-init images)
+enable_ssh: true  # Enables the SSH server on first boot
+
+# Optional: Disable SSH password authentication if using SSH keys only (recommended for security)
+ssh_pwauth: false
+{%- if reboot %}
+
+# Reboot after cloud-init completes
+power_state:
+  delay: now
+  mode: reboot
+  message: Rebooting after initial setup
+  timeout: 30
+  condition: true
+{%- endif %}
+

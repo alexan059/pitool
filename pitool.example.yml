@@ -1,0 +1,18 @@
+raspberry_pis:
+  - name: pi
+    hostname: raspberrypi
+    wifi:
+      country_code: DE
+      ssid: "YourWiFiSSID"
+      password: "YourWiFiPassword"
+    user:
+      name: pi
+      password: "$6$salt$hashedpassword"  # Use `pitool passwd` to generate
+      ssh_public_key: "ssh-ed25519 AAAA..."
+    timezone: Europe/Berlin
+    locale: en_US.UTF-8
+    update: true
+    upgrade: true
+    packages:
+      - ansible
+    reboot: true

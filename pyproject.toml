@@ -1,0 +1,53 @@
+[project]
+name = "pitool"
+version = "2.0.0"
+description = "Pitool let's you provision your Raspberry Pi's with the command line"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "alexan059"}
+]
+requires-python = ">=3.12"
+dependencies = [
+    "inquirerpy>=0.3.4",
+    "jinja2>=3.1.6",
+    "platformdirs>=4.5.1",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "rich>=14.2.0",
+    "typer>=0.15.0",
+]
+
+[project.scripts]
+pitool = "main:main"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+    "types-pyyaml>=6.0.12.20250915",
+]
