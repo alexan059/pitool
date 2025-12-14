@@ -9,11 +9,11 @@ from rich.progress import Progress
 
 from src.console import console
 from src.platform.base import PlatformHandler
-from src.platform.models import RemovableDevice
+from src.platform.models import ExternalDevice
 from src.utils import calculate_hash
 
 
-def _get_device_info(device: str) -> RemovableDevice:
+def _get_device_info(device: str) -> ExternalDevice:
     disk = subprocess.run(["diskutil", "info", device], capture_output=True, text=True)
     text = disk.stdout
 
@@ -23,7 +23,7 @@ def _get_device_info(device: str) -> RemovableDevice:
         "name": r"Device / Media Name:\s+(.+)",
         "size": r"Disk Size:\s+([0-9.]+ [A-Z]+)",
         "protocol": r"Protocol:\s+(.+)",
-        "removable": r"Removable Media:\s+(.+)",
+        "location": r"Device Location:\s+(.+)",
     }
 
     info = {}
@@ -32,13 +32,13 @@ def _get_device_info(device: str) -> RemovableDevice:
         if match:
             info[key] = match.group(1).strip()
 
-    return RemovableDevice(
+    return ExternalDevice(
         id=info.get("id"),
         node=info.get("node"),
         name=info.get("name"),
         size=info.get("size"),
         protocol=info.get("protocol"),
-        removable=info.get("removable", "") == "Removable",
+        location=info.get("location"),
     )
 
 
@@ -90,7 +90,7 @@ def _verify_flashed_device(image_path: str, device_id: str):
 
 
 class MacOSPlatform(PlatformHandler):
-    def list_removable_devices(self) -> list[RemovableDevice]:
+    def list_external_devices(self) -> list[ExternalDevice]:
         result = subprocess.run(
             ["diskutil", "list"], capture_output=True, text=True, check=True
         )
@@ -103,31 +103,31 @@ class MacOSPlatform(PlatformHandler):
                 continue
 
             device, *_ = line.strip().split()
-            removable_device = _get_device_info(device)
+            external_device = _get_device_info(device)
 
-            if removable_device.protocol != "USB" or not removable_device.removable:
+            if external_device.protocol != "USB" or external_device.location != "External":
                 continue
 
-            disks.append(removable_device)
+            disks.append(external_device)
 
         return disks
 
-    def _require_removable_device(self, device_id: str):
-        """Guard against non-removable devices"""
+    def _require_external_device(self, device_id: str):
+        """Guard against non-external devices"""
 
         # Never allow disk0 (system disk)
         if "disk0" in device_id:
             raise ValueError("Refusing to write to disk0 (system disk)")
 
         # Verify it's an external device
-        devices = self.list_removable_devices()
+        devices = self.list_external_devices()
         valid_nodes = [d.node for d in devices]
 
         if device_id not in valid_nodes:
-            raise ValueError(f"Device {device_id} is not a removable device")
+            raise ValueError(f"Device {device_id} is not a external device")
 
     def unmount_device(self, device_id: str) -> None:
-        self._require_removable_device(device_id)
+        self._require_external_device(device_id)
 
         console.print(f"[cyan]Unmounting {device_id}...[/cyan]")
 
@@ -150,7 +150,7 @@ class MacOSPlatform(PlatformHandler):
     ) -> None:
         """Flash image to device with safety checks"""
 
-        self._require_removable_device(device_id)
+        self._require_external_device(device_id)
 
         # Verify image exists
         if not Path(image_path).exists():
@@ -169,7 +169,7 @@ class MacOSPlatform(PlatformHandler):
             )
 
         image_resolved_path = Path(image_path)
-        devices = self.list_removable_devices()
+        devices = self.list_external_devices()
         device_info = next((d for d in devices if d.node == device_id), None)
 
         console.print(

@@ -2,10 +2,10 @@ from dataclasses import dataclass
 
 
 @dataclass
-class RemovableDevice:
+class ExternalDevice:
     id: str
     node: str
     name: str
     size: str
     protocol: str
-    removable: bool
+    location: str

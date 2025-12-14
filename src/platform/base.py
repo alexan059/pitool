@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 
-from src.platform.models import RemovableDevice
+from src.platform.models import ExternalDevice
 
 
 class PlatformHandler(ABC):
     """Abstract interface for platform-specific operations"""
 
     @abstractmethod
-    def list_removable_devices(self) -> list[RemovableDevice]:
-        """Return list of removable storage devices
+    def list_external_devices(self) -> list[ExternalDevice]:
+        """Return list of external storage devices
 
         Returns:
             List of dicts with keys: 'id', 'name', 'size'
