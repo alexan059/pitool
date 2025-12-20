@@ -105,7 +105,10 @@ class MacOSPlatform(PlatformHandler):
             device, *_ = line.strip().split()
             external_device = _get_device_info(device)
 
-            if external_device.protocol != "USB" or external_device.location != "External":
+            if (
+                external_device.protocol != "USB"
+                or external_device.location != "External"
+            ):
                 continue
 
             disks.append(external_device)
@@ -300,3 +303,44 @@ class MacOSPlatform(PlatformHandler):
             ) from None
 
         console.print("[green]✓[/green] Device ejected")
+
+    def trust_certificate(self, cert_path: str) -> None:
+        """Trust certificate using macOS security command
+
+        Args:
+            cert_path: Path to .pem certificate file
+        """
+        if not Path(cert_path).exists():
+            raise FileNotFoundError(f"Certificate not found: {cert_path}")
+
+        console.print("[cyan]Installing certificate to keychain...[/cyan]")
+
+        cmd = ["security", "add-trusted-cert", "-d", "-r", "trustRoot"]
+
+        try:
+            subprocess.run(
+                ["sudo", *cmd, "-k", "/Library/Keychains/System.keychain", cert_path],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            console.print("[green]✓[/green] Certificate trusted (system keychain)")
+
+            return
+        except subprocess.CalledProcessError:
+            console.print(
+                "[yellow]System keychain failed, trying user keychain...[/yellow]"
+            )
+
+        # Fallback to user keychain
+        try:
+            subprocess.run(
+                [*cmd, cert_path],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            console.print("[green]✓[/green] Certificate trusted (user keychain)")
+        except subprocess.CalledProcessError as e:
+            error_msg = e.stderr.strip() if e.stderr else "Unknown error"
+            raise RuntimeError(f"Failed to trust certificate: {error_msg}") from None

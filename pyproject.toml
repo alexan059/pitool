@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pitool"
-version = "2.0.2"
+version = "2.1.0"
 description = "Pitool lets you provision your Raspberry Pis from the command line"
 readme = "README.md"
 license = "MIT"

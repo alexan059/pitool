@@ -35,3 +35,8 @@ class PlatformHandler(ABC):
     def unmount_and_eject(self, device_id: str) -> None:
         """Unmount and eject device"""
         pass
+
+    @abstractmethod
+    def trust_certificate(self, cert_path: str) -> None:
+        """Trust certificate"""
+        pass

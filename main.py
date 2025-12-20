@@ -4,6 +4,7 @@ import typer
 
 from src.config.loader import load_config
 from src.config.passwd import generate_hashed_password
+from src.console import console
 from src.imaging.cloudinit import generate_cloudinit_files
 from src.imaging.downloader import (
     clear_download_cache,
@@ -12,7 +13,7 @@ from src.imaging.downloader import (
     prompt_for_image,
 )
 from src.imaging.flasher import flash_device, list_devices, prompt_for_device
-from src.networking.connect import connect_to_pi, wait_for_pi
+from src.networking.connect import connect_to_pi, download_from_pi, wait_for_pi
 from src.platform import get_platform_handler
 
 app = typer.Typer()
@@ -61,6 +62,31 @@ def connect():
 
     wait_for_pi(pi.hostname)
     connect_to_pi(pi.user.name, pi.hostname)
+
+
+@app.command("trust")
+def trust():
+    """Download and trust Pi's mkcert root CA certificate"""
+
+    try:
+        pi_config = load_config()
+        pi = pi_config.raspberry_pis[0]
+
+        wait_for_pi(pi.hostname)
+        with download_from_pi(
+            pi.user.name,
+            pi.hostname,
+            "~/.local/share/mkcert/rootCA.pem",
+        ) as cert_path:
+            platform = get_platform_handler()
+            platform.trust_certificate(cert_path)
+
+        console.print("\n[green]✓ Certificate trusted successfully![/green]")
+        console.print("[dim]Restart your browser to see changes[/dim]")
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1) from None
 
 
 def main():

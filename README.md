@@ -91,6 +91,14 @@ uv run pitool connect
 
 Waits for Pi to come online, removes old SSH host key, and connects via SSH.
 
+**Trust Pi's mkcert certificates:**
+```bash
+uv run pitool trust
+```
+
+Downloads and trusts the Pi's mkcert root CA certificate in your macOS keychain. 
+Required for accessing Pi services with local HTTPS certificates. Restart your browser after installation.
+
 ## Development
 
 **Tooling:**
@@ -116,6 +124,7 @@ uv sync --dev
 task run -- flash
 task run -- passwd
 task run -- connect
+task run -- trust
 
 # Lint code
 task check
