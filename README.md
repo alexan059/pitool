@@ -36,8 +36,22 @@ Automated Raspberry Pi boot drive provisioning with cloud-init.
 
 ### Installation
 
+Install globally as a [uv tool](https://docs.astral.sh/uv/concepts/tools/):
+
 ```bash
-git clone <repository-url>
+# From GitHub
+uv tool install git+https://github.com/alexan059/pitool.git
+
+# Or from a local clone
+uv tool install --from . pitool
+```
+
+This puts `pitool` on your `PATH` (run `uv tool update-shell` once if it isn't).
+
+For development, clone and sync instead:
+
+```bash
+git clone https://github.com/alexan059/pitool.git
 cd pitool
 uv sync --dev
 ```
@@ -73,27 +87,27 @@ See `pitool.example.yml` for reference.
 
 **Generate password hash:**
 ```bash
-uv run pitool passwd
+pitool passwd
 ```
 
 **Flash boot drive:**
 ```bash
-uv run pitool flash
+pitool flash
 
 # Clear download cache first
-uv run pitool flash --clear-cache
+pitool flash --clear-cache
 ```
 
 **Connect to Pi:**
 ```bash
-uv run pitool connect
+pitool connect
 ```
 
 Waits for Pi to come online, removes old SSH host key, and connects via SSH.
 
 **Trust Pi's mkcert certificates:**
 ```bash
-uv run pitool trust
+pitool trust
 ```
 
 Downloads and trusts the Pi's mkcert root CA certificate in your macOS keychain. 
@@ -105,35 +119,24 @@ Required for accessing Pi services with local HTTPS certificates. Restart your b
 
 - [uv](https://github.com/astral-sh/uv) (package manager)
 - [hatchling](https://hatch.pypa.io/) (build backend)
-- [Task](https://taskfile.dev) (task runner)
+- [Task](https://taskfile.dev) (task runner, optional, convenience wrapper around `uv` commands)
 
-**Install Task:**
+**Install Task** (optional):
 ```bash
 brew install go-task
 ```
 
 **Available tasks:**
 
-```bash
-# Install dependencies
-task sync
-# or
-uv sync --dev
+| Task            | Equivalent                       | Description                          |
+|-----------------|----------------------------------|--------------------------------------|
+| `task sync`     | `uv sync --dev`                  | Install dependencies                 |
+| `task install`  | `uv tool install --from . pitool`| Install pitool globally as a uv tool |
+| `task run -- X` | `uv run pitool X`                | Run CLI command (e.g. `flash`)       |
+| `task check`    | `uv run ruff check .`            | Lint code                            |
+| `task format`   | `uv run ruff format .`           | Format code                          |
 
-# Run CLI directly
-task run -- flash
-task run -- passwd
-task run -- connect
-task run -- trust
-
-# Lint code
-task check
-
-# Format code
-task format
-```
-
-See `Taskfile.yml` for all available tasks.
+See `Taskfile.yml` for the source of truth.
 
 ## License
 
