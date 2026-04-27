@@ -23,14 +23,13 @@ dependencies = [
 ]
 
 [project.scripts]
-pitool = "main:main"
+pitool = "src.main:main"
 
 [tool.uv]
 package = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
-include = ["main.py"]
 
 [tool.ruff]
 line-length = 88
