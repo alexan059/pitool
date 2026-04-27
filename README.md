@@ -4,7 +4,7 @@ Automated Raspberry Pi boot drive provisioning with cloud-init.
 
 > **Platform Support:** Currently macOS only. Uses `diskutil` and `dd` for direct drive flashing. Linux and Windows support planned.
 >
-> **Why not rpi-imager?** Raspberry Pi Imager 2.0+ removed CLI support (`--cli` flag), so we use direct `dd` flashing with platform abstractions for future cross-platform compatibility.
+> **Why not rpi-imager?** Hobby project. Imager 2.x has had issues that broke my workflow, so I automated the flow myself: YAML config, cloud-init provisioning, direct `dd` flashing, with platform abstractions for future Linux/Windows support.
 
 ## Requirements
 
