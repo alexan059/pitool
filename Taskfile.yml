@@ -18,3 +18,7 @@ tasks:
   format:
     desc: "Format files"
     cmd: uv run ruff format .
+
+  install:
+    desc: "Install pitool globally as a uv tool"
+    cmd: uv tool install --from . pitool
